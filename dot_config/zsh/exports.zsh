@@ -3,8 +3,8 @@ export EDITOR="vim"
 export VISUAL="$EDITOR"
 
 # ── Language ───────────────────────────────────────────────────────────────
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
+export LANG="de_DE.UTF-8"
+export LC_ALL="de_DE.UTF-8"
 
 # ── PKG_CONFIG_PATH (Homebrew libraries) ──────────────────────────────────
 _pkg_libs=(openssl libtiff gmp libpng ncurses mpfr icu4c readline webp unixodbc libpq)
