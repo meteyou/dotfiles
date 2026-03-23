@@ -1,0 +1,57 @@
+# ── Powerlevel10k instant prompt (must stay at top) ────────────────────────
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# ── Homebrew ───────────────────────────────────────────────────────────────
+if [[ -f /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# ── Powerlevel10k theme ───────────────────────────────────────────────────
+[[ -f "$HOMEBREW_PREFIX/share/powerlevel10k/powerlevel10k.zsh-theme" ]] && \
+  source "$HOMEBREW_PREFIX/share/powerlevel10k/powerlevel10k.zsh-theme"
+
+# ── Source modular configs ────────────────────────────────────────────────
+for config_file in "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/{exports,aliases,functions,local}.zsh; do
+  [[ -f "$config_file" ]] && source "$config_file"
+done
+unset config_file
+
+# ── History ───────────────────────────────────────────────────────────────
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_DUPS       # keine doppelten Einträge hintereinander
+setopt HIST_IGNORE_SPACE      # Befehle mit Space-Prefix nicht speichern
+setopt HIST_REDUCE_BLANKS     # überflüssige Leerzeichen entfernen
+setopt SHARE_HISTORY          # History zwischen Sessions teilen
+setopt INC_APPEND_HISTORY     # sofort schreiben, nicht erst bei exit
+
+# ── Completions ───────────────────────────────────────────────────────────
+autoload -Uz compinit
+# Nur einmal pro Tag neu generieren
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'         # case-insensitive
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"      # farbige Completion
+zstyle ':completion:*' menu select                           # Menü-Auswahl
+
+# ── Tool initialization ───────────────────────────────────────────────────
+eval "$(fzf --zsh 2>/dev/null)"
+eval "$(zoxide init zsh 2>/dev/null)"
+[[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
+
+# ── Plugins (autosuggestions before syntax-highlighting, always last) ─────
+[[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && \
+  source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && \
+  source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# ── Powerlevel10k config ─────────────────────────────────────────────────
+[[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
