@@ -15,6 +15,9 @@ done
 unset _lib _pc _pkg_libs
 
 # ── PATH additions ────────────────────────────────────────────────────────
+# Remove stale asdf install paths from PATH (asdf 0.18+ injects these)
+export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '\.asdf/installs/' | tr '\n' ':' | sed 's/:$//')
+
 # asdf version manager
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 
