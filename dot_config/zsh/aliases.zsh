@@ -55,9 +55,6 @@ alias df="df -h"
 alias du="du -h"
 alias mkdir="mkdir -pv"
 
-# ── pi (force system Node.js) ─────────────────────────────────────────────
-alias pi="/opt/homebrew/bin/node /opt/homebrew/bin/pi"
-
 # ── chezmoi shortcuts ─────────────────────────────────────────────────────
 alias cz="chezmoi"
 alias cze="chezmoi edit"

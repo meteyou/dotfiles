@@ -55,3 +55,4 @@ eval "$(zoxide init zsh 2>/dev/null)"
 
 # ── Powerlevel10k config ─────────────────────────────────────────────────
 [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+
