@@ -53,3 +53,10 @@ serve() {
   echo "Serving on http://localhost:$port"
   python3 -m http.server "$port"
 }
+
+# ── pi - Always run with global Node.js (asdf) version ────────────────────
+pi() {
+  local ver
+  ver=$(grep nodejs "$HOME/.tool-versions" 2>/dev/null | awk '{print $2}')
+  ASDF_NODEJS_VERSION="${ver:-24.16.0}" command pi "$@"
+}
