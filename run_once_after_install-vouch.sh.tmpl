@@ -1,0 +1,42 @@
+#!/bin/bash
+# chezmoi run_once_after: Install the vouch CLI (https://github.com/mitchellh/vouch)
+# Runs once on first `chezmoi apply` (re-runs if this script changes).
+#
+# vouch is a Nushell module, so this clones the repo and installs a small
+# wrapper on PATH that points VOUCH_LIB_DIR at the cloned module. Nushell
+# itself is installed by run_once_before_install-packages.
+
+set -euo pipefail
+
+VOUCH_REPO="https://github.com/mitchellh/vouch"
+VOUCH_DIR="$HOME/.local/share/vouch"
+BIN_DIR="$HOME/.local/bin"
+WRAPPER="$BIN_DIR/vouch"
+
+# ── Ensure Nushell is available ───────────────────────────────────────────
+if ! command -v nu &>/dev/null; then
+  echo "⚠ Nushell (nu) not found — skipping vouch install. Install nushell first."
+  exit 0
+fi
+
+# ── Clone or update the vouch repo ────────────────────────────────────────
+if [[ -d "$VOUCH_DIR/.git" ]]; then
+  echo "▶ Updating vouch repo..."
+  git -C "$VOUCH_DIR" pull --ff-only --quiet || echo "⚠ Could not update vouch repo (continuing)."
+else
+  echo "▶ Cloning vouch repo..."
+  rm -rf "$VOUCH_DIR"
+  git clone --quiet "$VOUCH_REPO" "$VOUCH_DIR"
+fi
+
+# ── Install the wrapper on PATH ───────────────────────────────────────────
+echo "▶ Installing vouch wrapper to $WRAPPER..."
+mkdir -p "$BIN_DIR"
+cat > "$WRAPPER" <<'EOF'
+#!/usr/bin/env bash
+export VOUCH_LIB_DIR="$HOME/.local/share/vouch/vouch"
+exec "$HOME/.local/share/vouch/action/setup-vouch/vouch" "$@"
+EOF
+chmod +x "$WRAPPER"
+
+echo "✓ vouch CLI installed (run 'vouch' for help)."
