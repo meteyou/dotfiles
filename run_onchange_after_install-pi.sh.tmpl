@@ -31,7 +31,14 @@ asdf reshim nodejs
 
 # ── pi (managed install, self-contained in ~/.pi/agent/install) ──────────
 # Uses the global asdf Node.js so the installer doesn't depend on the cwd.
-if ! command -v pi &>/dev/null; then
+# A stale asdf shim can make `command -v pi` succeed, so check the managed
+# install marker or a working pi instead.
+pi_is_installed() {
+  [[ -f "$HOME/.pi/agent/install/managed-install.json" ]] \
+    || ASDF_NODEJS_VERSION="$node_version" pi --version &>/dev/null
+}
+
+if ! pi_is_installed; then
   echo "▶ Installing pi..."
   ASDF_NODEJS_VERSION="$node_version" PI_EXPERIMENTAL=1 \
     sh -c "$(curl -fsSL https://pi.dev/install.sh)"
