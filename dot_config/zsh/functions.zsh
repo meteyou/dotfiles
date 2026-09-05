@@ -55,8 +55,10 @@ serve() {
 }
 
 # ── pi - Always run with global Node.js (asdf) version ────────────────────
+# Bypasses the asdf shim so a project's .tool-versions can't pick an older
+# Node.js for pi. Works with both npm -g and managed (~/.pi/agent) installs.
 pi() {
   local ver
-  ver=$(grep nodejs "$HOME/.tool-versions" 2>/dev/null | awk '{print $2}')
-  ASDF_NODEJS_VERSION="${ver:-24.16.0}" command pi "$@"
+  ver=$(awk '$1 == "nodejs" { print $2 }' "$HOME/.tool-versions" 2>/dev/null)
+  PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/installs/nodejs/${ver:-24.16.0}/bin:$PATH" command pi "$@"
 }

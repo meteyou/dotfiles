@@ -19,6 +19,7 @@ installed and configured automatically.
 | **Git Aliases**       | Compact shortcuts (`gs`, `gl`, `gp`, `gcp`, …)                                                            |
 | **Utility Functions** | `extract` (archives), `mkcd`, `myip`, `serve`, `psgrep`                                                   |
 | **Package Manager**   | [Homebrew](https://brew.sh/) – packages are installed automatically                                       |
+| **AI Coding Agent**   | [pi](https://pi.dev) (managed install) with [pi-stuff](https://github.com/meteyou/pi-stuff) & skills       |
 
 ## 📁 Repo Structure
 
@@ -26,13 +27,16 @@ installed and configured automatically.
 .
 ├── dot_zshrc                              # Main Zsh configuration
 ├── dot_p10k.zsh                           # Powerlevel10k prompt configuration
+├── dot_tool-versions                      # Global asdf versions (Node.js)
 ├── dot_config/
 │   └── zsh/
 │       ├── aliases.zsh                    # Shell aliases (git, navigation, tools, …)
 │       ├── exports.zsh                    # Environment variables, PATH, tool config
 │       ├── functions.zsh                  # Helper functions (extract, mkcd, serve, …)
 │       └── create_local.zsh               # Template for machine-specific config
-└── run_once_before_install-packages.sh.tmpl   # Automatic package installation (Homebrew)
+├── dot_pi/agent/skills/                   # pi skills (brave-search, browser-tools)
+├── run_once_before_install-packages.sh.tmpl   # Automatic package installation (Homebrew)
+└── run_onchange_after_install-pi.sh.tmpl      # Node.js (asdf), pi + pi packages/skills
 ```
 
 ## 🚀 Installation
@@ -55,6 +59,7 @@ This command will:
 2. Clone this repo
 3. Automatically install all Homebrew packages (including Homebrew itself)
 4. Apply all configurations
+5. Install Node.js via asdf, [pi](https://pi.dev) and its packages/skills
 
 ### If chezmoi is already installed
 

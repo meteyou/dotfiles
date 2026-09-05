@@ -15,6 +15,9 @@ done
 unset _lib _pc _pkg_libs
 
 # ── PATH additions ────────────────────────────────────────────────────────
+# Keep PATH free of duplicates (e.g. from .zprofile, nested shells, installers)
+typeset -U path PATH
+
 # Remove stale asdf install paths from PATH (asdf 0.18+ injects these)
 export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '\.asdf/installs/' | tr '\n' ':' | sed 's/:$//')
 

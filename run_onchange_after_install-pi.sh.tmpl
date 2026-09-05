@@ -1,0 +1,56 @@
+#!/bin/bash
+# chezmoi run_onchange_after: Install Node.js (asdf), pi and pi packages
+# Runs after `chezmoi apply` whenever this script's content changes
+
+set -euo pipefail
+
+{{ if eq .chezmoi.os "darwin" -}}
+
+# ── Make Homebrew + asdf available in this non-interactive shell ──────────
+eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v asdf &>/dev/null; then
+  echo "✗ asdf not found — run 'chezmoi apply' again after the brew install script finished." >&2
+  exit 1
+fi
+
+# ── Node.js via asdf (version from ~/.tool-versions) ──────────────────────
+if ! asdf plugin list 2>/dev/null | grep -qx nodejs; then
+  echo "▶ Adding asdf nodejs plugin..."
+  asdf plugin add nodejs
+fi
+
+node_version="$(awk '$1 == "nodejs" { print $2 }' "$HOME/.tool-versions")"
+if ! asdf list nodejs 2>/dev/null | grep -q "$node_version"; then
+  echo "▶ Installing Node.js $node_version via asdf..."
+  asdf install nodejs "$node_version"
+fi
+asdf reshim nodejs
+
+# ── pi (managed install, self-contained in ~/.pi/agent/install) ──────────
+# Uses the global asdf Node.js so the installer doesn't depend on the cwd.
+if ! command -v pi &>/dev/null; then
+  echo "▶ Installing pi..."
+  ASDF_NODEJS_VERSION="$node_version" PI_EXPERIMENTAL=1 \
+    sh -c "$(curl -fsSL https://pi.dev/install.sh)"
+fi
+
+# ── pi packages (idempotent: already installed packages are skipped) ──────
+echo "▶ Installing pi packages..."
+ASDF_NODEJS_VERSION="$node_version" pi install https://github.com/meteyou/pi-stuff.git
+
+# ── Skill dependencies (skills are managed by chezmoi, node_modules are not) ─
+for skill_dir in "$HOME"/.pi/agent/skills/*/; do
+  if [[ -f "$skill_dir/package.json" && ! -d "$skill_dir/node_modules" ]]; then
+    echo "▶ Installing dependencies for skill $(basename "$skill_dir")..."
+    (cd "$skill_dir" && ASDF_NODEJS_VERSION="$node_version" npm install --no-fund --no-audit --silent)
+  fi
+done
+
+echo "✓ pi setup complete!"
+
+{{ else -}}
+echo "⚠ Not macOS — skipping pi install. Install manually: https://pi.dev"
+{{ end -}}
