@@ -48,14 +48,6 @@ fi
 echo "▶ Installing pi packages..."
 ASDF_NODEJS_VERSION="$node_version" pi install https://github.com/meteyou/pi-stuff.git
 
-# ── Skill dependencies (skills are managed by chezmoi, node_modules are not) ─
-for skill_dir in "$HOME"/.pi/agent/skills/*/; do
-  if [[ -f "$skill_dir/package.json" && ! -d "$skill_dir/node_modules" ]]; then
-    echo "▶ Installing dependencies for skill $(basename "$skill_dir")..."
-    (cd "$skill_dir" && ASDF_NODEJS_VERSION="$node_version" npm install --no-fund --no-audit --silent)
-  fi
-done
-
 echo "✓ pi setup complete!"
 
 {{ else -}}
